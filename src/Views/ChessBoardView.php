@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace App\Views;
 
 class ChessBoardView {
-    public static function render(string $fen): void {
-        $pieces = [
-            'p' => '♟', 'r' => '♜', 'n' => '♞', 'b' => '♝', 'q' => '♛', 'k' => '♚',
-            'P' => '♙', 'R' => '♖', 'N' => '♘', 'B' => '♗', 'Q' => '♕', 'K' => '♔'
-        ];
+    private const PIECES = [
+        'p' => '♟', 'r' => '♜', 'n' => '♞', 'b' => '♝', 'q' => '♛', 'k' => '♚',
+        'P' => '♙', 'R' => '♖', 'N' => '♘', 'B' => '♗', 'Q' => '♕', 'K' => '♔'
+    ];
 
+    private const LIGHT_CELL_COLOR = '#f0d9b5';
+    private const DARK_CELL_COLOR = '#b58863';
+    private const CELL_SIZE = 50; // Размер клетки в пикселях
+
+    public static function render(string $fen): void {
         $rows = explode('/', $fen);
-        $boardHtml = '<div style="display: grid; grid-template-columns: repeat(8, 50px); gap: 0;">';
+        $boardHtml = sprintf('<div style="display: grid; grid-template-columns: repeat(8, %dpx); gap: 0;">', self::CELL_SIZE);
 
         foreach ($rows as $rowIndex => $row) {
             $colIndex = 0;
@@ -22,15 +26,13 @@ class ChessBoardView {
                 if (is_numeric($char)) {
                     // Добавляем пустые клетки
                     for ($j = 0; $j < (int)$char; $j++) {
-                        $bgColor = (($colIndex + $rowIndex) % 2 == 0) ? '#f0d9b5' : '#b58863';
-                        $boardHtml .= "<div style='width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: $bgColor;'></div>";
+                        $boardHtml .= self::renderCell($rowIndex, $colIndex);
                         $colIndex++;
                     }
                 } else {
                     // Добавляем клетку с фигурой
-                    $bgColor = (($colIndex + $rowIndex) % 2 == 0) ? '#f0d9b5' : '#b58863';
-                    $piece = $pieces[$char] ?? '·';
-                    $boardHtml .= "<div style='width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background-color: $bgColor; font-size: 24px;'>$piece</div>";
+                    $piece = self::PIECES[$char] ?? '·';
+                    $boardHtml .= self::renderCell($rowIndex, $colIndex, $piece);
                     $colIndex++;
                 }
             }
@@ -38,5 +40,20 @@ class ChessBoardView {
 
         $boardHtml .= '</div>';
         echo $boardHtml;
+    }
+
+    private static function renderCell(int $rowIndex, int $colIndex, string $content = ''): string {
+        $bgColor = self::getCellColor($rowIndex, $colIndex);
+        return sprintf(
+            "<div style='width: %dpx; height: %dpx; display: flex; align-items: center; justify-content: center; background-color: %s; font-size: 24px;'>%s</div>",
+            self::CELL_SIZE,
+            self::CELL_SIZE,
+            $bgColor,
+            $content
+        );
+    }
+
+    private static function getCellColor(int $rowIndex, int $colIndex): string {
+        return (($rowIndex + $colIndex) % 2 === 0) ? self::LIGHT_CELL_COLOR : self::DARK_CELL_COLOR;
     }
 }
