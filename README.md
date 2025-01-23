@@ -1,8 +1,36 @@
-сборка докера - sudo docker compose up -d
+Команды Makefile
 
-применяем миграции - docker exec -i php sh -c "sh apply_migrations.sh"
+1. Поднятие контейнеров
 
-инсталлируем зависимости - docker exec -i php sh -c "composer install"
+`make docker-up`
 
-запускаем тесты - docker exec -i php sh -c "./vendor/bin/phpunit"
+Запускает Docker-контейнеры в фоновом режиме с помощью docker compose.
 
+2. Применение миграций
+
+`make migrate`
+
+Применяет миграции внутри контейнера php. Выполняет скрипт apply_migrations.sh.
+
+3. Установка зависимостей
+
+`make install-deps`
+
+Устанавливает зависимости с помощью composer внутри контейнера php.
+
+4. Запуск тестов
+
+`make test`
+
+Запускает тесты с помощью PHPUnit, используя путь ./vendor/bin/phpunit.
+
+5. Выполнение всех шагов
+
+`make all`
+
+Запускает все вышеуказанные команды по порядку: поднимает контейнеры, применяет миграции, устанавливает зависимости и запускает тесты.
+
+http://localhost:8080/?id=1
+http://localhost:8080/?id=2
+
+id - индификатор расположения шахмат в бд
